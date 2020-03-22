@@ -1,0 +1,151 @@
+This is a very basic implementation of classic 8-puzzle problem. The whole program is written in Java programming language.
+This implementation utilizes 2 of the very basic Approaches. These are,
+
+i. f(n) = g(n) + h(n); [Summation of length of the path from start node and heuristic values]
+
+ii. By calculating total misplaced tiles
+
+Initially the program is working as for the first approach. But the second approach is also implemented in the code
+which is commented out. If anyone is willing to utilize the second approach then they can follow the Second Approach Steps section instructions.
+
+Basic Problem
+The 8-puzzle problem is a puzzle invented and popularized by Noyes Palmer Chapman in the 1870s. It is played on a 3-by-3 grid with 8
+square blocks labeled 1 through 8 and a blank square. The goal is to rearrange the blocks so that they are in order.
+You are permitted to slide blocks horizontally or vertically into the blank square.
+The following shows a sequence of legal moves from an initial board position (left) to the goal position (right).
+
+   1  3        1     3        1  2  3        1  2  3        1  2  3
+4  2  5   =>   4  2  5   =>   4     5   =>   4  5      =>   4  5  6
+7  8  6        7  8  6        7  8  6        7  8  6        7  8
+
+initial                                                     goal
+
+First Approach Steps
+Initially the program is working as for the first approach. So, no need to modify the code.
+
+Runnable or the launcher class: Launcher.java
+
+In this class some initial house keeping stuffs has been maintained by generating random numbers between 0-8 to
+establish the initial state of the problem. In this class it is implemented a method which is
+
+public static boolean searchSameNumber(int [] initialState, int a){
+
+		for(int i=0; i<totalCells; i++){
+
+			if(initialState[i] == a){
+
+				return true;
+			}
+		}
+
+		return false;
+}
+This method checks each cells number of the board are same or not with the value generated randomly.
+
+The main class which is doing all the calculations is Solver.java
+There is another utility class implemented which is State.java
+
+All the code documentation is written in the code. There are 2 priority queues have been implemented here.
+For first approach I implemented this piece of code,
+
+final PriorityQueue <State> queue = new PriorityQueue<State>(100, new Comparator<State>(){
+
+		@Override
+		public int compare(State a, State b) {
+
+			return a.priority() - b.priority();
+		}
+});
+This priority queue will store the solution states as well as all the expanded states.
+
+Second Approach Steps
+To experience the second approach we need to modify some lines of codes. First, in Solver.
+java implement the code given below for the priority queue (which is currently commented out in the code)
+
+final PriorityQueue <State> queue = new PriorityQueue<State>(100, new Comparator<State>(){
+
+  @Override
+  public int compare(State a, State b) {
+
+    int lowestMisplacedTiles = 0;		// Stores total number of tiles that are misplaced
+
+    // Comparing misplaced tiles
+    for(int i=0; i<Launcher.totalCells; i++){
+
+      if(a.tiles[i] != b.tiles[i]){
+
+        lowestMisplacedTiles++;
+      }
+    }
+
+    return lowestMisplacedTiles;
+  }
+});
+and now comment out the previous code of the Priority queue which is,
+
+final PriorityQueue <State> queue = new PriorityQueue<State>(100, new Comparator<State>(){
+
+  @Override
+  public int compare(State a, State b) {
+
+    return a.priority() - b.priority();
+  }
+});
+Secondly, in State.java comment out these lines:
+
+Line 8: public int g;
+
+Line 9: public int h;
+
+Line 22: g = 0;
+
+Line 23: h = heuristic(tiles);
+
+Line 40: g = previousState.g + 1;
+
+Line 41: h = heuristic(tiles);
+
+Now comment out these 3 methods given below:
+
+public int priority(){
+
+  return g + h;
+}
+public int manhattanDistance(int a, int b){
+
+  return Math.abs(a/3 - b/3) + Math.abs(a%3 - b%3);
+}
+public int heuristic(int [] tiles){
+
+  int h = 0;
+
+  for(int i=0; i<tiles.length; i++){
+
+    if(tiles[i] != 0){
+
+      // Storing the maximum value from current h value and the Manhattan distance of the tile
+      h = Math.max(h, manhattanDistance(i, tiles[i]));
+    }
+  }
+
+  return h;
+}
+Everything is done. Now, good to go.
+
+Compilation
+Run Launcher.java from any IDE (which supports java).
+
+From command prompt or power shell write these codes: javac *.java and then java Launcher
+
+Analysis
+In the end of the program a search analysis has been done which includes,
+
+Total time taken
+Nodes Searched
+Path cost
+For first approach, it takes less time to find the right solution and its path cost is no more than 26.
+
+For second approach, it takes more time than the first approach and also it generates more path cost.
+
+Drawbacks
+As the program generates random numbers to form the initial state, therefore most of the cases it does not find any solution for that specific state.
